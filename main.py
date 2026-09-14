@@ -1,4 +1,5 @@
 ### Data ###
+from selectors import SelectSelector
 
 recipes = {
     "small": {
@@ -45,7 +46,11 @@ class SandwichMachine:
 
     def check_resources(self, ingredients):
         """Returns True when order can be made, False if ingredients are insufficient."""
-
+        for item, amount in ingredients.items():
+            if self.machine_resources[item] < amount:
+                print(f"Sorry there is not enough {item}.")
+                return False
+        return True
     def process_coins(self):
         """Returns the total calculated from coins inserted.
            Hint: include input() function here, e.g. input("how many quarters?: ")"""
