@@ -1,103 +1,35 @@
+import data
+from sandwich_maker import SandwichMaker
+from cashier import Cashier
+
+# Make an instance of other classes here
+resources = data.resources
+recipes = data.recipes
+sandwich_maker_instance = SandwichMaker(resources)
+cashier_instance = Cashier()
 
 
-recipes = {
-    "small": {
-        "ingredients": {
-            "bread": 2,  ## slice
-            "ham": 4,  ## slice
-            "cheese": 4,  ## ounces
-        },
-        "cost": 1.75,
-    },
-    "medium": {
-        "ingredients": {
-            "bread": 4,  ## slice
-            "ham": 6,  ## slice
-            "cheese": 8,  ## ounces
-        },
-        "cost": 3.25,
-    },
-    "large": {
-        "ingredients": {
-            "bread": 6,  ## slice
-            "ham": 8,  ## slice
-            "cheese": 12,  ## ounces
-        },
-        "cost": 5.5,
-    }
-}
+def main():
+    is_on = True
 
-resources = {
-    "bread": 12,  ## slice
-    "ham": 18,  ## slice
-    "cheese": 24,  ## ounces
-}
+    while is_on:
+        choice = input("What would you like? (small/ medium/ large/ off/ report): ").lower()
 
-
-### Complete functions ###
-
-class SandwichMachine:
-
-    def __init__(self, machine_resources):
-        """Receives resources as input.
-           Hint: bind input variable to self variable"""
-        self.machine_resources = machine_resources
-
-    def check_resources(self, ingredients):
-        """Returns True when order can be made, False if ingredients are insufficient."""
-        for item, amount in ingredients.items():
-            if self.machine_resources[item] < amount:
-                print(f"Sorry there is not enough {item}.")
-                return False
-        return True
-
-    def process_coins(self):
-        """Returns the total calculated from coins inserted.
-           Hint: include input() function here, e.g. input("how many quarters?: ")"""
-        print("Please insert coins.")
-        large_dollars = int(input("how many large dollars?: ")) * 1.00
-        half_dollars = int(input("how many half dollars?: ")) * 0.50
-        quarters = int(input("how many quarters?: ")) * 0.25
-        nickels = int(input("how many nickels?: ")) * 0.05
-
-        total = large_dollars + half_dollars + quarters + nickels
-        return total
-
-    def transaction_result(self, coins, cost):
-        """Return True when the payment is accepted, or False if money is insufficient."""
-        if coins >= cost:
-            change = round(coins - cost, 2)
-            print(f"Here is ${change} in change.")
-            return True
+        if choice == "off":
+            is_on = False
+        elif choice == "report":
+            print(f"Bread: {sandwich_maker_instance.machine_resources['bread']} slice(s)")
+            print(f"Ham: {sandwich_maker_instance.machine_resources['ham']} slice(s)")
+            print(f"Cheese: {sandwich_maker_instance.machine_resources['cheese']} slice(s)")
+        elif choice in recipes:
+            sandwich = recipes[choice]
+            if sandwich_maker_instance.check_resources(sandwich["ingredients"]):
+                payment = cashier_instance.process_coins()
+                if cashier_instance.transaction_result(payment, sandwich["cost"]):
+                    sandwich_maker_instance.make_sandwich(choice, sandwich["ingredients"])
         else:
-            print("Sorry that's not enough money. Money refunded.")
-            return False
-
-    def make_sandwich(self, sandwich_size, order_ingredients):
-        """Deduct the required ingredients from the resources."""
-        for item, amount in order_ingredients.items():
-            self.machine_resources[item] -= amount
-
-        print(f"{sandwich_size} sandwich is ready. Bon appetit!")
+            print("Invalid choice. Please try again.")
 
 
-machine = SandwichMachine(resources)
-is_on = True
-
-while is_on:
-    choice = input("What would you like? (small/ medium/ large/ off/ report): ").lower()
-
-    if choice == "off":
-        is_on = False
-    elif choice == "report":
-        print(f"Bread: {machine.machine_resources['bread']} slice(s)")
-        print(f"Ham: {machine.machine_resources['ham']} slice(s)")
-        print(f"Cheese: {machine.machine_resources['cheese']} slice(s)")
-    elif choice in recipes:
-        sandwich = recipes[choice]
-        if machine.check_resources(sandwich["ingredients"]):
-            payment = machine.process_coins()
-            if machine.transaction_result(payment, sandwich["cost"]):
-                machine.make_sandwich(choice, sandwich["ingredients"])
-    else:
-        print("Invalid choice. Please try again.")
+if __name__ == "__main__":
+    main()
